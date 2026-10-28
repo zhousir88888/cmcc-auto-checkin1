@@ -1,0 +1,27 @@
+name: 中国移动每日签到
+on:
+  schedule:
+    # UTC时间！北京时间早上8点 = UTC 0点
+    - cron: '0 17 * * *'
+  workflow_dispatch: # 支持手动点运行测试
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+      - name: 安装python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+      - name: 执行签到脚本
+        env:
+          CMCC_APP_TOKEN: ${{ secrets.CMCC_APP_TOKEN }}
+          CMCC_PHONE: ${{ secrets.CMCC_PHONE }}
+          CMCC_PROVINCE_CODE: ${{ secrets.CMCC_PROVINCE_CODE }}
+          CMCC_CITY_CODE: ${{ secrets.CMCC_CITY_CODE }}
+          CMCC_COC3_TICKET: ${{ secrets.CMCC_COC3_TICKET }}
+          CMCC_SERVERCHAN_SENDKEY: ${{ secrets.CMCC_SERVERCHAN_SENDKEY }}
+        run: python3 cmcc_sign.py --tasks --games --delay 1800
